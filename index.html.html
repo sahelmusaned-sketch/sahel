@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تحليلات التعلم — برنامج تدريب العمالة المنزلية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<style>
+:root{--navy:#0B1D3A;--blue:#1A4FA0;--teal:#0A7B72;--gold:#C8961A;--silver:#8FA3BE;--light:#F0F5FC;--white:#FFFFFF;--red:#C0392B;--green:#1A7A4A;--text:#1C2B40;--muted:#6B7E96;--border:#D4DEEB}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Tajawal',sans-serif;background:#EEF3FA;color:var(--text);direction:rtl}
+/* HEADER */
+.header{background:linear-gradient(135deg,#0B1D3A 0%,#1A4FA0 60%,#0A7B72 100%);position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
+.hi{position:relative;max-width:1400px;margin:0 auto;padding:40px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.hl{display:flex;align-items:center;gap:18px}
+.hlogo{width:62px;height:62px;background:rgba(255,255,255,.15);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid rgba(255,255,255,.2)}
+.htitle h1{font-size:22px;font-weight:800;color:#fff;line-height:1.2}
+.htitle p{font-size:11px;color:rgba(255,255,255,.7);margin-top:3px}
+.hmeta{display:flex;gap:8px;flex-wrap:wrap}
+.hb{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 11px;border-radius:20px;font-size:11px}
+.pw{background:var(--gold);color:#fff;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700}
+/* KPI */
+.kpi-strip{background:var(--navy)}
+.kpi-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr)}
+.kc{padding:18px 14px;text-align:center;border-left:1px solid rgba(255,255,255,.08)}
+.kc:last-child{border-left:none}
+.kn{font-size:28px;font-weight:800;color:#fff;line-height:1}
+.kl{font-size:10px;color:var(--silver);margin-top:4px;text-transform:uppercase}
+/* LAYOUT */
+.main{max-width:1400px;margin:0 auto;padding:26px 40px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.full{grid-column:1/-1}
+/* CARD */
+.card{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(11,29,58,.07);border:1px solid var(--border)}
+.ch{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);background:linear-gradient(to left,var(--light),var(--white))}
+.ci{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ch h2{font-size:14px;font-weight:700;color:var(--navy)}
+.ch p{font-size:10px;color:var(--muted);margin-top:1px}
+.cb{padding:20px}
+/* COMPANY */
+.cgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.cc{border-radius:12px;overflow:hidden;border:1px solid var(--border);transition:transform .2s}
+.cc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(11,29,58,.1)}
+.ct{padding:12px 16px;color:#fff;font-weight:700;font-size:13px}
+.cbody{padding:12px 16px;background:var(--white)}
+.cs{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.cs:last-child{border-bottom:none;padding-bottom:0}
+.cs .lb{color:var(--muted)}.cs .vl{font-weight:600;color:var(--navy)}
+.bl{display:inline-block;padding:2px 6px;border-radius:8px;font-size:9px;font-weight:600;background:var(--light);color:var(--blue);border:1px solid var(--border);margin:1px}
+/* TABLE */
+.dt{width:100%;border-collapse:collapse;font-size:11px}
+.dt th{background:var(--navy);color:#fff;padding:8px 10px;text-align:right;font-weight:600;font-size:10px}
+.dt td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.dt tr:nth-child(even) td{background:var(--light)}
+.dt tr:hover td{background:#E8F0FB}
+.dt .tot td{background:var(--navy)!important;color:#fff;font-weight:700}
+.st{display:inline-flex;align-items:center;gap:4px}
+.dot{width:7px;height:7px;border-radius:50%}
+.da{background:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.25)}
+.di{background:#94a3b8}.dw{background:#f59e0b}
+/* MODULES */
+.mr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.mr:last-child{border-bottom:none}
+.mn{width:24px;height:24px;border-radius:6px;background:var(--light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0}
+.mname{flex:1;font-size:11px}.mname small{display:block;font-size:9px;color:var(--muted);margin-top:1px}
+.ms{font-size:11px;font-weight:700;padding:2px 8px;border-radius:7px;white-space:nowrap}
+.m100{background:#dcfce7;color:#166534}.mhigh{background:#d1fae5;color:#065f46}
+.mgood{background:#dbeafe;color:#1e40af}.mmid{background:#fef9c3;color:#854d0e}
+.mzero{background:#f1f5f9;color:#94a3b8}
+.mtime{font-size:9px;color:var(--muted);background:var(--light);padding:2px 6px;border-radius:7px;white-space:nowrap}
+/* TIMELINE JOURNEY */
+.journey{background:linear-gradient(135deg,#0B1D3A,#1A4FA0);border-radius:14px;padding:24px;color:#fff;margin-bottom:20px}
+.journey-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:6px}
+.journey-sub{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:20px}
+.journey-timeline{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:10px}
+.jday{display:flex;flex-direction:column;align-items:center;min-width:80px}
+.jdate{font-size:9px;color:rgba(255,255,255,.6);margin-bottom:6px;text-align:center}
+.jdot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.3);border:2px solid rgba(255,255,255,.4);position:relative;z-index:1;flex-shrink:0}
+.jdot.active{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(200,150,26,.3)}
+.jdot.done{background:#4ade80;border-color:#4ade80}
+.jdot.cert{background:#f472b6;border-color:#f472b6;box-shadow:0 0 0 4px rgba(244,114,182,.3)}
+.jline{flex:1;height:2px;background:rgba(255,255,255,.2);min-width:20px}
+.jlabel{font-size:9px;color:rgba(255,255,255,.7);margin-top:6px;text-align:center;max-width:75px}
+.jgrade{font-size:10px;font-weight:700;color:var(--gold);margin-top:2px;text-align:center}
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.stat-box{background:rgba(255,255,255,.08);border-radius:10px;padding:14px;text-align:center;border:1px solid rgba(255,255,255,.12)}
+.stat-num{font-size:26px;font-weight:800;color:#fff;line-height:1}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,.6);margin-top:4px}
+/* TIMELINE LIST */
+.tl{list-style:none;position:relative;padding:0}
+.tl::before{content:'';position:absolute;right:17px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl li{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;position:relative;padding-right:44px}
+.td2{position:absolute;right:9px;top:3px;width:17px;height:17px;border-radius:50%;background:var(--white);border:3px solid var(--blue);z-index:1}
+.td2.done{background:var(--green);border-color:var(--green)}
+.td2.skip{background:var(--border);border-color:var(--border)}
+.tc h4{font-size:11px;font-weight:700;color:var(--navy)}
+.tc p{font-size:10px;color:var(--muted);margin-top:1px}
+.tt{font-size:9px;color:var(--muted);background:var(--light);padding:2px 6px;border-radius:7px;margin-top:2px;display:inline-block}
+/* PROGRESS */
+.pr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pl{width:110px;font-size:10px;color:var(--muted);flex-shrink:0;text-align:right}
+.pbw{flex:1;background:var(--light);border-radius:5px;height:8px;overflow:hidden}
+.pb{height:100%;border-radius:5px}
+.pv{width:36px;font-size:10px;font-weight:700;color:var(--navy);text-align:left;flex-shrink:0}
+.cw{position:relative;height:220px}
+#map{height:300px;border-radius:12px;overflow:hidden}
+.footer{background:var(--navy);color:rgba(255,255,255,.5);text-align:center;padding:16px;font-size:10px;margin-top:30px}
+@media(max-width:900px){.main{grid-template-columns:1fr;padding:14px}.kpi-inner{grid-template-columns:repeat(3,1fr)}.cgrid{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.journey-timeline{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+<div class="hi">
+<div class="hl">
+<div class="hlogo">🏠</div>
+<div class="htitle">
+<h1>تقرير تحليلات التعلم — برنامج تدريب العمالة المنزلية قبل الاستقدام</h1>
+<p>شركة تكامل (مساند) · 3 شركات استقدام · 9 وحدات تدريبية · أبريل 2026</p>
+</div>
+</div>
+<div class="hmeta">
+<span class="hb">📅 أبريل 2026</span>
+<span class="hb">3 شركات</span>
+<span class="hb">9 موديولات</span>
+<span class="pw">⚡ Learning Analytics</span>
+</div>
+</div>
+</div>
+
+<!-- KPI -->
+<div class="kpi-strip">
+<div class="kpi-inner">
+<div class="kc"><div class="kn" style="color:#fbbf24">76</div><div class="kl">إجمالي المتدربات</div></div>
+<div class="kc"><div class="kn" style="color:#4ade80">5</div><div class="kl">نشطات حالياً</div></div>
+<div class="kc"><div class="kn" style="color:#5eead4">1</div><div class="kl">شهادة حضور</div></div>
+<div class="kc"><div class="kn" style="color:#60a5fa">9</div><div class="kl">وحدات تدريبية</div></div>
+<div class="kc"><div class="kn" style="color:#f472b6">10</div><div class="kl">أيام رحلة المتدربة</div></div>
+<div class="kc"><div class="kn" style="color:#a78bfa">84.4%</div><div class="kl">متوسط الدرجات</div></div>
+</div>
+</div>
+
+<div class="main">
+
+<!-- ══ الشركات ══ -->
+<div class="card full">
+<div class="ch"><div class="ci" style="background:#EEF3FA">🏢</div><div><h2>توزيع المتدربات حسب شركة الاستقدام</h2><p>بيانات مُستخرجة من تحليلات التعلم · منصة تكامل (مساند)</p></div></div>
+<div class="cb">
+<div class="cgrid">
+<div class="cc"><div class="ct" style="background:linear-gradient(135deg,#1A4FA0,#0A7B72)">🏢 رواد النخبة</div><div class="cbody">
+<div class="cs"><span class="lb">الإجمالي</span><span class="vl">25 متدربة</span></div>
+<div class="cs"><span class="lb">الجنسيات</span><span class="vl">🇺🇬 أوغندا 5 · 🇪🇹 أثيوبيا 10 · 🇰🇪 كينيا 10</span></div>
+<div class="cs"><span class="lb">النشطات</span><span class="vl" style="color:#22c55e">● 5 نشطة</span></div>
+<div class="cs"><span class="lb">الشهادات</span><span class="vl" style="color:#3b82f6">✓ 1 شهادة حضور</span></div>
+<div class="cs"><span class="lb">اللغات</span><div><span class="bl">🇬🇧 إنجليزية</span><span class="bl">🇪🇹 أرومو أفان</span></div></div>
+</div></div>
+<div class="cc"><div class="ct" style="background:linear-gradient(135deg,#7C3AED,#2563EB)">🏢 ركن أديم للاستقدام</div><div class="cbody">
+<div class="cs"><span class="lb">الإجمالي</span><span class="vl">19 متدربة</span></div>
+<div class="cs"><span class="lb">الجنسيات</span><span class="vl">🇱🇰 سيريلانكا (19)</span></div>
+<div class="cs"><span class="lb">النشطات</span><span class="vl" style="color:#94a3b8">○ 0 نشطة</span></div>
+<div class="cs"><span class="lb">الشهادات</span><span class="vl" style="color:#94a3b8">— لا يوجد</span></div>
+<div class="cs"><span class="lb">اللغات</span><div><span class="bl">🇱🇰 سنهالية</span></div></div>
+</div></div>
+<div class="cc"><div class="ct" style="background:linear-gradient(135deg,#C8961A,#D97706)">🏢 المعتمد للاستقدام</div><div class="cbody">
+<div class="cs"><span class="lb">الإجمالي</span><span class="vl">32 متدربة</span></div>
+<div class="cs"><span class="lb">الجنسيات</span><span class="vl">🇧🇩 بنجلاديش 10 · 🇰🇪 كينيا 2 · 🇺🇬 أوغندا 10 · 🇪🇹 أثيوبيا 10</span></div>
+<div class="cs"><span class="lb">النشطات</span><span class="vl" style="color:#94a3b8">○ 0 نشطة</span></div>
+<div class="cs"><span class="lb">الشهادات</span><span class="vl" style="color:#94a3b8">— لا يوجد</span></div>
+<div class="cs"><span class="lb">اللغات</span><div><span class="bl">🇧🇩 بنغالي</span><span class="bl">🇬🇧 إنجليزية</span><span class="bl">🇪🇹 أرومو أفان</span></div></div>
+</div></div>
+</div>
+<table class="dt">
+<thead><tr><th>شركة الاستقدام</th><th>الجنسية</th><th>العدد</th><th>لغة البرنامج</th><th>النشطات</th><th>الشهادات</th><th>الحالة</th></tr></thead>
+<tbody>
+<tr><td>رواد النخبة</td><td>🇺🇬 أوغندا</td><td>5</td><td>إنجليزية</td><td>1</td><td>1</td><td><span class="st"><span class="dot da"></span>نشطة</span></td></tr>
+<tr><td>رواد النخبة</td><td>🇪🇹 أثيوبيا</td><td>10</td><td>أرومو أفان</td><td>4</td><td>—</td><td><span class="st"><span class="dot da"></span>نشطة جزئياً</span></td></tr>
+<tr><td>رواد النخبة</td><td>🇰🇪 كينيا</td><td>10</td><td>إنجليزية</td><td>0</td><td>0</td><td><span class="st"><span class="dot di"></span>لم تبدأ</span></td></tr>
+<tr><td>ركن أديم</td><td>🇱🇰 سيريلانكا</td><td>19</td><td>سنهالية</td><td>0</td><td>0</td><td><span class="st"><span class="dot dw"></span>قيد الانتظار</span></td></tr>
+<tr><td>المعتمد</td><td>🇧🇩 بنجلاديش</td><td>10</td><td>بنغالي</td><td>0</td><td>0</td><td><span class="st"><span class="dot di"></span>لم تبدأ</span></td></tr>
+<tr><td>المعتمد</td><td>🇰🇪 كينيا</td><td>2</td><td>إنجليزية</td><td>—</td><td>—</td><td><span class="st"><span class="dot di"></span>لم تبدأ</span></td></tr>
+<tr><td>المعتمد</td><td>🇺🇬 أوغندا</td><td>10</td><td>إنجليزية</td><td>0</td><td>0</td><td><span class="st"><span class="dot di"></span>لم تبدأ</span></td></tr>
+<tr><td>المعتمد</td><td>🇪🇹 أثيوبيا</td><td>10</td><td>أرومو أفان</td><td>0</td><td>0</td><td><span class="st"><span class="dot di"></span>لم تبدأ</span></td></tr>
+<tr class="tot"><td colspan="2">الإجمالي الكلي</td><td>76</td><td>5 لغات</td><td>5</td><td>1</td><td>—</td></tr>
+</tbody></table>
+</div></div>
+
+<!-- ══ CHARTS ══ -->
+<div class="card"><div class="ch"><div class="ci" style="background:#EEF3FA">📊</div><div><h2>توزيع المتدربات حسب الجنسية</h2><p>الإجمالي: 76 متدربة</p></div></div><div class="cb"><div class="cw"><canvas id="nc"></canvas></div></div></div>
+<div class="card"><div class="ch"><div class="ci" style="background:#EEF3FA">🌐</div><div><h2>توزيع اللغات المستخدمة</h2><p>5 لغات — برنامج متعدد اللغات</p></div></div><div class="cb"><div class="cw"><canvas id="lc"></canvas></div></div></div>
+
+<!-- ══ رحلة المتدربة المرئية ══ -->
+<div class="card full">
+<div class="ch"><div class="ci" style="background:#FEF9EC">⏱️</div><div><h2>رحلة المتدربة الزمنية كما سجّلتها تحليلات التعلم</h2><p>NABIRYE SHAMIM · أوغندا · من 20 أبريل إلى 30 أبريل 2026 · 10 أيام كاملة</p></div></div>
+<div class="cb">
+<div class="journey">
+<div class="journey-title">⏱️ خريطة الرحلة — 10 أيام من الولوج الأول إلى الشهادة</div>
+<div class="journey-sub">كل نقطة تمثل إتمام وحدة تدريبية · البيانات مُستخرجة من Outline Report · LMS تكامل</div>
+<div class="journey-timeline">
+  <div class="jday"><div class="jdate">20 أبر</div><div class="jdot done"></div><div class="jlabel">م01 التكيف الثقافي</div><div class="jgrade">100%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">20 أبر</div><div class="jdot done"></div><div class="jlabel">م02 النظافة الشخصية</div><div class="jgrade">100%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">22 أبر</div><div class="jdot done"></div><div class="jlabel">م03 التنظيف المنزلي</div><div class="jgrade">83.33%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">22 أبر</div><div class="jdot done"></div><div class="jlabel">م04 الطبخ السعودي</div><div class="jgrade">90.90%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">22 أبر</div><div class="jdot done"></div><div class="jlabel">م05 الأثاث</div><div class="jgrade">75%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">23 أبر</div><div class="jdot done"></div><div class="jlabel">م06 التقنيات</div><div class="jgrade">81.81%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">28 أبر</div><div class="jdot done"></div><div class="jlabel">م07 الرعاية</div><div class="jgrade">71.42%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">30 أبر</div><div class="jdot done"></div><div class="jlabel">م08 السلامة</div><div class="jgrade">71.42%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">30 أبر</div><div class="jdot active"></div><div class="jlabel">م09 نصائح</div><div class="jgrade" style="color:#94a3b8">0%</div></div>
+  <div class="jline"></div>
+  <div class="jday"><div class="jdate">30 أبر</div><div class="jdot cert"></div><div class="jlabel">🏆 شهادة الحضور</div><div class="jgrade" style="color:#f472b6">2:06 PM</div></div>
+</div>
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-num">10</div><div class="stat-lbl">أيام إجمالية · 20–30 أبريل</div></div>
+  <div class="stat-box"><div class="stat-num">84.4%</div><div class="stat-lbl">متوسط الدرجات (8 وحدات)</div></div>
+  <div class="stat-box"><div class="stat-num">2</div><div class="stat-lbl">وحدات بدرجة 100%</div></div>
+  <div class="stat-box"><div class="stat-num">9</div><div class="stat-lbl">وحدات مُكملة / متاحة</div></div>
+</div>
+</div>
+</div></div>
+
+<!-- ══ الوحدات التسعة ══ -->
+<div class="card full">
+<div class="ch"><div class="ci" style="background:#dbeafe">📚</div><div><h2>درجات الوحدات التدريبية التسعة — Outline Report</h2><p>NABIRYE SHAMIM · أوغندا · Certificate of Attendance · 30 أبريل 2026 · 2:06 PM</p></div></div>
+<div class="cb">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+<div>
+<div style="overflow-x:auto">
+<table class="dt" style="font-size:11px">
+<thead><tr><th>م</th><th>اسم الوحدة</th><th>الدرجة</th><th>آخر دخول</th><th>المدة المتبقية</th></tr></thead>
+<tbody>
+<tr><td style="font-weight:700;color:var(--blue)">01</td><td>Cultural Adaptation &amp; Social Interaction Skills</td><td><span style="background:#dcfce7;color:#166534;padding:2px 7px;border-radius:6px;font-weight:700">100/100</span></td><td style="font-size:10px;color:var(--muted)">20 أبريل — 5:02 PM</td><td style="font-size:10px;color:var(--muted)">13 أيام 16 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">02</td><td>Practical Skills for Personal Hygiene &amp; Appearance</td><td><span style="background:#dcfce7;color:#166534;padding:2px 7px;border-radius:6px;font-weight:700">100/100</span></td><td style="font-size:10px;color:var(--muted)">20 أبريل — 5:37 PM</td><td style="font-size:10px;color:var(--muted)">13 أيام 15 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">03</td><td>Effective Techniques for Home Cleaning</td><td><span style="background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:6px;font-weight:700">83.33/100</span></td><td style="font-size:10px;color:var(--muted)">22 أبريل — 3:25 PM</td><td style="font-size:10px;color:var(--muted)">11 أيام 17 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">04</td><td>Cooking Arts and Preparing Saudi Meals</td><td><span style="background:#d1fae5;color:#065f46;padding:2px 7px;border-radius:6px;font-weight:700">90.90/100</span></td><td style="font-size:10px;color:var(--muted)">22 أبريل — 4:03 PM</td><td style="font-size:10px;color:var(--muted)">11 أيام 17 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">05</td><td>Skills for Caring for Furniture &amp; Furnishings</td><td><span style="background:#fef9c3;color:#854d0e;padding:2px 7px;border-radius:6px;font-weight:700">75/100</span></td><td style="font-size:10px;color:var(--muted)">22 أبريل — 4:37 PM</td><td style="font-size:10px;color:var(--muted)">11 أيام 16 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">06</td><td>Skills for Using Modern Technologies</td><td><span style="background:#dbeafe;color:#1e40af;padding:2px 7px;border-radius:6px;font-weight:700">81.81/100</span></td><td style="font-size:10px;color:var(--muted)">23 أبريل — 5:39 PM</td><td style="font-size:10px;color:var(--muted)">10 أيام 15 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">07</td><td>Specialized Care Skills (Elderly - Children)</td><td><span style="background:#fef9c3;color:#854d0e;padding:2px 7px;border-radius:6px;font-weight:700">71.42/100</span></td><td style="font-size:10px;color:var(--muted)">28 أبريل — 4:01 PM</td><td style="font-size:10px;color:var(--muted)">5 أيام 17 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">08</td><td>Occupational Safety Skills &amp; Emergency Response</td><td><span style="background:#fef9c3;color:#854d0e;padding:2px 7px;border-radius:6px;font-weight:700">71.42/100</span></td><td style="font-size:10px;color:var(--muted)">30 أبريل — 1:49 PM</td><td style="font-size:10px;color:var(--muted)">3 أيام 19 ساعة</td></tr>
+<tr><td style="font-weight:700;color:var(--blue)">09</td><td>Important Tips for Domestic Workers</td><td><span style="background:#f1f5f9;color:#94a3b8;padding:2px 7px;border-radius:6px;font-weight:700">0/100</span></td><td style="font-size:10px;color:var(--muted)">30 أبريل — 2:05 PM</td><td style="font-size:10px;color:var(--muted)">3 أيام 19 ساعة</td></tr>
+<tr style="background:#e0f4f0"><td colspan="2" style="font-weight:700;color:var(--teal)">🏆 Certificate of Attendance</td><td colspan="3" style="font-size:10px;color:var(--teal);font-weight:600">صدرت: 30 أبريل 2026 — 2:06 PM · عدد المشاهدات: 1</td></tr>
+</tbody></table>
+</div>
+<div style="margin-top:14px;padding:12px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:10px;color:#fff;font-size:11px">
+<div style="font-weight:700;margin-bottom:8px">📌 ملاحظة تحليلية من اللوج</div>
+<div style="color:rgba(255,255,255,.8);line-height:1.7">
+• الوحدات 01 و02: أُكملتا في نفس اليوم (20 أبريل) بدرجة 100%<br>
+• الوحدات 03 و04 و05: أُكملت في يوم واحد (22 أبريل) — نشاط عالٍ<br>
+• الوحدة 06: اليوم التالي (23 أبريل)<br>
+• فجوة 5 أيام قبل الوحدة 07 (28 أبريل) — تراجع انتظام<br>
+• الوحدتان 08 و09: في نفس اليوم الأخير (30 أبريل) — عجلة للإنهاء<br>
+• الوحدة 09 انتهت بدرجة 0% — لم تُكمل الاختبار
+</div>
+</div>
+</div>
+<div>
+<div class="cw" style="height:280px"><canvas id="mc"></canvas></div>
+<div style="margin-top:14px"><div class="cw" style="height:160px"><canvas id="tc2"></canvas></div></div>
+</div>
+</div>
+</div></div>
+
+<!-- ══ خريطة الولوج ══ -->
+<div class="card full">
+<div class="ch"><div class="ci" style="background:#E0F4F0">🗺️</div><div><h2>خريطة الولوج من بلد الاستقدام — دليل سهولة الوصول</h2><p>IP Tracking مُستخرج من تحليلات التعلم · الولوج من بلد المنشأ قبل الاستقدام</p></div></div>
+<div class="cb">
+<div id="map"></div>
+<div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:11px;height:11px;border-radius:50%;background:#1A4FA0;display:inline-block"></span>رواد النخبة</div>
+<div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:11px;height:11px;border-radius:50%;background:#7C3AED;display:inline-block"></span>ركن أديم</div>
+<div style="display:flex;align-items:center;gap:5px;font-size:11px"><span style="width:11px;height:11px;border-radius:50%;background:#C8961A;display:inline-block"></span>المعتمد</div>
+</div>
+<div style="margin-top:12px;background:#0B1D3A;border-radius:10px;padding:12px;font-family:monospace;font-size:11px;direction:ltr;line-height:1.9">
+<div style="color:#5eead4;margin-bottom:5px;font-family:'Tajawal',sans-serif;font-size:10px;direction:rtl">● سجل عمليات الولوج من بلد الاستقدام — IP Log</div>
+<div style="color:#60a5fa">196.191.223.199 → TENBO BAYANA — Addis Ababa, Ethiopia ✓ active</div>
+<div style="color:#60a5fa">196.191.223.199 → KARTU IMA — Addis Ababa, Ethiopia ⚠ لم تستكمل</div>
+<div style="color:#60a5fa">196.189.39.79 → ABARAYA MAMESANI — Addis Ababa, Ethiopia ✓ active</div>
+<div style="color:#60a5fa">196.189.39.79 → ADEM MUSA — Addis Ababa, Ethiopia ✓ active</div>
+<div style="color:#f9a8d4">NABIRYE SHAMIM → Uganda ✓ Certificate of Attendance — 30 April 2026</div>
+</div>
+</div></div>
+
+<!-- ══ رحلة التفصيلية + إحصاءات ══ -->
+<div class="card">
+<div class="ch"><div class="ci" style="background:#FEF9EC">📋</div><div><h2>الرحلة التفصيلية يوماً بيوم</h2><p>NABIRYE SHAMIM · 10 أيام فقط من البداية للشهادة</p></div></div>
+<div class="cb">
+<ul class="tl">
+<li><span class="td2 done"></span><div class="tc"><h4>التسجيل وبدء البرنامج</h4><p>رواد النخبة · منصة تكامل (مساند)</p><span class="tt">يوم 1 — 20 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م01 — التكيف الثقافي والتفاعل الاجتماعي · 100/100 ✓</h4><p>5:02 PM · الأيام المتبقية للانتهاء: 13 ي 16 س</p><span class="tt">20 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م02 — النظافة الشخصية والمظهر · 100/100 ✓</h4><p>5:37 PM · نفس اليوم · 13 ي 15 س</p><span class="tt">20 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م03 — التنظيف المنزلي · 83.33/100</h4><p>3:25 PM · 11 ي 17 س</p><span class="tt">22 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م04 — الطبخ السعودي · 90.90/100</h4><p>4:03 PM · 11 ي 17 س</p><span class="tt">22 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م05 — العناية بالأثاث · 75/100</h4><p>4:37 PM · 11 ي 16 س</p><span class="tt">22 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م06 — التقنيات الحديثة · 81.81/100</h4><p>5:39 PM · 10 ي 15 س</p><span class="tt">23 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م07 — رعاية كبار السن والأطفال · 71.42/100</h4><p>4:01 PM · 5 ي 17 س</p><span class="tt">28 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>م08 — السلامة المهنية والطوارئ · 71.42/100</h4><p>1:49 PM · 3 ي 19 س</p><span class="tt">30 أبريل 2026</span></div></li>
+<li><span class="td2 skip"></span><div class="tc"><h4>م09 — نصائح مهمة للعمالة المنزلية · 0/100</h4><p>2:05 PM · لم تُكمل الاختبار</p><span class="tt">30 أبريل 2026</span></div></li>
+<li><span class="td2 done"></span><div class="tc"><h4>✅ Certificate of Attendance — شهادة الحضور</h4><p>مُصدرة · 1 مشاهدة</p><span class="tt">30 أبريل 2026 — 2:06 PM</span></div></li>
+</ul>
+</div></div>
+
+<!-- ══ الإحصاءات ══ -->
+<div class="card">
+<div class="ch"><div class="ci" style="background:#f0fdf4">📈</div><div><h2>إحصاءات الأداء والإنجاز</h2><p>تحليل معدل الإنجاز والدرجات</p></div></div>
+<div class="cb">
+<div style="margin-bottom:16px">
+<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:10px">معدل الإنجاز حسب الجنسية</div>
+<div class="pr"><div class="pl">🇺🇬 أوغندا (رواد)</div><div class="pbw"><div class="pb" style="width:20%;background:#1A4FA0"></div></div><div class="pv">20%</div></div>
+<div class="pr"><div class="pl">🇪🇹 أثيوبيا (رواد)</div><div class="pbw"><div class="pb" style="width:40%;background:#0A7B72"></div></div><div class="pv">40%</div></div>
+<div class="pr"><div class="pl">🇰🇪 كينيا</div><div class="pbw"><div class="pb" style="width:0%;background:#94a3b8"></div></div><div class="pv">0%</div></div>
+<div class="pr"><div class="pl">🇱🇰 سيريلانكا</div><div class="pbw"><div class="pb" style="width:0%;background:#94a3b8"></div></div><div class="pv">0%</div></div>
+<div class="pr"><div class="pl">🇧🇩 بنجلاديش</div><div class="pbw"><div class="pb" style="width:0%;background:#94a3b8"></div></div><div class="pv">0%</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<div style="background:var(--light);border-radius:9px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--navy)">10 أيام</div><div style="font-size:9px;color:var(--muted)">إجمالي زمن رحلة المتدربة</div></div>
+<div style="background:var(--light);border-radius:9px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--gold)">84.4%</div><div style="font-size:9px;color:var(--muted)">متوسط 8 وحدات مكتملة</div></div>
+<div style="background:var(--light);border-radius:9px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--green)">2</div><div style="font-size:9px;color:var(--muted)">وحدتان بدرجة 100% كاملة</div></div>
+<div style="background:var(--light);border-radius:9px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--red)">1</div><div style="font-size:9px;color:var(--muted)">وحدة 0% — لم تُكمل الاختبار</div></div>
+</div>
+</div></div>
+
+</div>
+
+<div class="footer">
+<p>تقرير تحليلات التعلم · برنامج تدريب العمالة المنزلية قبل الاستقدام · شركة تكامل (مساند)</p>
+<p style="margin-top:3px">البيانات مُستخرجة من Outline Report · نظام إدارة التعلم LMS · أبريل 2026</p>
+</div>
+
+<script>
+Chart.defaults.font.family="'Tajawal',sans-serif";
+new Chart(document.getElementById('nc'),{type:'doughnut',data:{labels:['أثيوبيا (20)','أوغندا (15)','كينيا (12)','سيريلانكا (19)','بنجلاديش (10)'],datasets:[{data:[20,15,12,19,10],backgroundColor:['#1A4FA0','#0A7B72','#C8961A','#7C3AED','#DB2777'],borderWidth:3,borderColor:'#fff',hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{padding:8,font:{size:11}}}}}});
+new Chart(document.getElementById('lc'),{type:'pie',data:{labels:['إنجليزية (27)','أرومو أفان (30)','سنهالية (19)','بنغالي (10)','أمهرية (1)'],datasets:[{data:[27,30,19,10,1],backgroundColor:['#1A4FA0','#0A7B72','#7C3AED','#C8961A','#DB2777'],borderWidth:3,borderColor:'#fff',hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:8,font:{size:10}}}}}});
+const grades=[100,100,83.33,90.90,75,81.81,71.42,71.42,0];
+const bclrs=grades.map(g=>g===100?'#16a34a':g>=85?'#1A4FA0':g>=75?'#C8961A':g>0?'#f59e0b':'#94a3b8');
+new Chart(document.getElementById('mc'),{type:'bar',data:{labels:['م01','م02','م03','م04','م05','م06','م07','م08','م09'],datasets:[{label:'الدرجة / 100',data:grades,backgroundColor:bclrs,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`الدرجة: ${ctx.raw}/100`}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:0,max:100,grid:{color:'#f0f0f0'},ticks:{stepSize:20,callback:v=>v+'%'}}}}});
+// Timeline — days remaining vs grade
+new Chart(document.getElementById('tc2'),{type:'line',data:{labels:['م1','م2','م3','م4','م5','م6','م7','م8','م9'],datasets:[{label:'الدرجة %',data:[100,100,83.33,90.90,75,81.81,71.42,71.42,0],borderColor:'#1A4FA0',backgroundColor:'rgba(26,79,160,.1)',tension:.4,pointRadius:5,pointBackgroundColor:'#1A4FA0',fill:true,yAxisID:'y'},{label:'أيام لانتهاء المهلة',data:[13,13,11,11,11,10,5,3,3],borderColor:'#C8961A',backgroundColor:'rgba(200,150,26,.1)',tension:.4,pointRadius:5,pointBackgroundColor:'#C8961A',fill:false,yAxisID:'y2',borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:10}}}},scales:{y:{type:'linear',position:'right',min:0,max:100,grid:{display:false},ticks:{callback:v=>v+'%',font:{size:9}}},y2:{type:'linear',position:'left',min:0,max:16,grid:{color:'#f0f0f0'},ticks:{callback:v=>v+' ي',font:{size:9}}}}}});
+// MAP
+const map=L.map('map',{zoomControl:true}).setView([15,50],2);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(map);
+const mi=(c)=>L.divIcon({html:`<div style="width:14px;height:14px;border-radius:50%;background:${c};border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.3)"></div>`,iconSize:[14,14],iconAnchor:[7,7],className:''});
+const pts=[
+{lat:9.145,lng:40.489,l:"🇪🇹 أثيوبيا — أديس أبابا",s:"TENBO BAYANA + ABARAYA MAMESANI + ADEM MUSA + KARTU IMA · رواد النخبة",c:"#1A4FA0"},
+{lat:1.373,lng:32.290,l:"🇺🇬 أوغندا",s:"NABIRYE SHAMIM — Certificate of Attendance ✓ 30 أبريل 2026",c:"#1A4FA0"},
+{lat:-1.292,lng:36.821,l:"🇰🇪 كينيا — نيروبي",s:"12 متدربة — لم تبدأ بعد",c:"#1A4FA0"},
+{lat:7.873,lng:80.771,l:"🇱🇰 سيريلانكا",s:"19 متدربة — ركن أديم للاستقدام",c:"#7C3AED"},
+{lat:23.685,lng:90.356,l:"🇧🇩 بنجلاديش",s:"10 متدربات — المعتمد للاستقدام",c:"#C8961A"}
+];
+pts.forEach(p=>{L.marker([p.lat,p.lng],{icon:mi(p.c)}).bindPopup(`<b style="font-family:Tajawal">${p.l}</b><br><small>${p.s}</small>`).addTo(map)});
+const sa=[23.886,45.079];
+pts.forEach(p=>{L.polyline([[p.lat,p.lng],sa],{color:p.c,weight:1.5,opacity:.35,dashArray:'5 5'}).addTo(map)});
+</script>
+</body>
+</html>
